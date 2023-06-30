@@ -24,8 +24,8 @@
 package com.seiama.registry;
 
 import java.util.NoSuchElementException;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A holder of a value.
@@ -33,6 +33,7 @@ import org.jetbrains.annotations.Nullable;
  * @param <V> the value type
  * @since 1.0.0
  */
+@NullMarked
 public sealed interface Holder<V> permits Holders.Immediate, Holders.Lazy {
   /**
    * Checks if this holder has a value associated.
@@ -57,7 +58,7 @@ public sealed interface Holder<V> permits Holders.Immediate, Holders.Lazy {
    * @throws NoSuchElementException if no value is bound
    * @since 1.0.0
    */
-  default @NotNull V valueOrThrow() throws NoSuchElementException {
+  default V valueOrThrow() throws NoSuchElementException {
     final @Nullable V value = this.value();
     if (value == null) {
       throw new NoSuchElementException("A value has not been defined for " + this);
@@ -71,7 +72,7 @@ public sealed interface Holder<V> permits Holders.Immediate, Holders.Lazy {
    * @return the type
    * @since 1.0.0
    */
-  @NotNull Type type();
+  Type type();
 
   /**
    * The type of holder.

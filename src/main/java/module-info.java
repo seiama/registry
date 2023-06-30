@@ -23,6 +23,7 @@
  */
 module com.seiama.registry {
   requires static transitive org.jetbrains.annotations;
+  requires static transitive org.jspecify;
 
   exports com.seiama.registry;
 }

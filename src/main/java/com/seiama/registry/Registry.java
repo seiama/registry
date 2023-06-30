@@ -24,9 +24,9 @@
 package com.seiama.registry;
 
 import java.util.Set;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.jetbrains.annotations.UnmodifiableView;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 /**
  * A registry.
@@ -35,6 +35,7 @@ import org.jetbrains.annotations.UnmodifiableView;
  * @param <V> the value type
  * @since 1.0.0
  */
+@NullMarked
 public interface Registry<K, V> {
   /**
    * Creates a new registry.
@@ -44,19 +45,21 @@ public interface Registry<K, V> {
    * @return a registry
    * @since 1.0.0
    */
-  static <K, V> @NotNull Registry<K, V> create() {
+  static <K, V> Registry<K, V> create() {
     return new RegistryImpl<>();
   }
 
   /**
    * Gets a holder by its key.
    *
+   * <p>{@code null} will be returned if no value has been {@link #register(Object, Object) registered} for {@code key}.</p>
+   *
    * @param key the key
-   * @return a holder
+   * @return a holder, or {@code null}
    * @since 1.0.0
    */
   @SuppressWarnings("checkstyle:MethodName")
-  @Nullable Holder<V> getHolder(final @NotNull K key);
+  @Nullable Holder<V> getHolder(final K key);
 
   /**
    * Gets a holder by its key, or creates a new holder.
@@ -66,7 +69,7 @@ public interface Registry<K, V> {
    * @since 1.0.0
    */
   @SuppressWarnings("checkstyle:MethodName")
-  @NotNull Holder<V> getOrCreateHolder(final @NotNull K key);
+  Holder<V> getOrCreateHolder(final K key);
 
   /**
    * Registers {@code value} to {@code key}, returning a {@link Holder}.
@@ -76,7 +79,7 @@ public interface Registry<K, V> {
    * @return a holder
    * @since 1.0.0
    */
-  @NotNull Holder<V> register(final @NotNull K key, final @NotNull V value);
+  Holder<V> register(final K key, final V value);
 
   /**
    * Gets the keys.
@@ -85,5 +88,5 @@ public interface Registry<K, V> {
    * @since 1.0.0
    */
   @UnmodifiableView
-  @NotNull Set<K> keys();
+  Set<K> keys();
 }

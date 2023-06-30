@@ -27,29 +27,29 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-import org.jetbrains.annotations.UnknownNullability;
 import org.jetbrains.annotations.VisibleForTesting;
+import org.jspecify.annotations.NullMarked;
+import org.jspecify.annotations.Nullable;
 
 import static java.util.Objects.requireNonNull;
 
+@NullMarked
 final class RegistryImpl<K, V> implements Registry<K, V> {
   private final Map<K, Holder<V>> keyToHolder = new HashMap<>();
   private @Nullable Set<K> keys;
 
   @Override
-  public @Nullable Holder<V> getHolder(final @NotNull K key) {
+  public @Nullable Holder<V> getHolder(final K key) {
     return this.getHolder0(key, false);
   }
 
   @Override
-  public @NotNull Holder<V> getOrCreateHolder(final @NotNull K key) {
+  public Holder<V> getOrCreateHolder(final K key) {
     return this.getHolder0(key, true);
   }
 
   @SuppressWarnings("checkstyle:MethodName")
-  private @UnknownNullability Holder<V> getHolder0(final @NotNull K key, final boolean create) {
+  private Holder<V> getHolder0(final K key, final boolean create) {
     requireNonNull(key, "key");
 
     @Nullable Holder<V> holder = this.keyToHolder.get(key);
@@ -68,7 +68,7 @@ final class RegistryImpl<K, V> implements Registry<K, V> {
   }
 
   @Override
-  public @NotNull Holder<V> register(final @NotNull K key, final @NotNull V value) {
+  public Holder<V> register(final K key, final V value) {
     requireNonNull(key, "key");
     requireNonNull(value, "value");
 
@@ -103,7 +103,7 @@ final class RegistryImpl<K, V> implements Registry<K, V> {
   }
 
   @Override
-  public @NotNull Set<K> keys() {
+  public Set<K> keys() {
     if (this.keys == null) {
       this.keys = Collections.unmodifiableSet(this.keyToHolder.keySet());
     }
