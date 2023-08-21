@@ -23,6 +23,7 @@
  */
 package com.seiama.registry;
 
+import java.util.Optional;
 import java.util.StringJoiner;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
@@ -39,6 +40,11 @@ final class Holders {
     @Override
     public boolean bound() {
       return true; // An immediate holder always has a value associated with it.
+    }
+
+    @Override
+    public Optional<V> valueOptionally() {
+      return Optional.of(this.value);
     }
 
     @Override

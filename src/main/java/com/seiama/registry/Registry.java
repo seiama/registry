@@ -23,6 +23,7 @@
  */
 package com.seiama.registry;
 
+import java.util.Optional;
 import java.util.Set;
 import org.jetbrains.annotations.UnmodifiableView;
 import org.jspecify.annotations.NullMarked;
@@ -56,16 +57,35 @@ public interface Registry<K, V> {
    *
    * @param key the key
    * @return a holder, or {@code null}
+   * @throws NullPointerException if the provided key is null
    * @since 1.0.0
    */
   @SuppressWarnings("checkstyle:MethodName")
   @Nullable Holder<V> getHolder(final K key);
 
   /**
-   * Gets a holder by its key, or creates a new holder.
+   * Gets a holder by its key.
+   *
+   * <p>{@link Optional#empty()} will be returned if no value has been {@link #register(Object, Object) registered} for {@code key}.</p>
+   *
+   * @param key the key
+   * @return a holder, or {@link Optional#empty()}
+   * @throws NullPointerException if the provided key is null
+   * @since 1.0.0
+   */
+  @SuppressWarnings("checkstyle:MethodName")
+  default Optional<Holder<V>> getHolderOptionally(final K key) {
+    return Optional.ofNullable(this.getHolder(key));
+  }
+
+  /**
+   * Gets a holder by its key, or creates a new holder if one does not already exist and registers it against the provided key.
+   *
+   * <p>The returned holder may contain a value if one has previously been registered, or it may be empty, pending future value registration.</p>
    *
    * @param key the key
    * @return a holder
+   * @throws NullPointerException if the provided key is null
    * @since 1.0.0
    */
   @SuppressWarnings("checkstyle:MethodName")
@@ -77,6 +97,7 @@ public interface Registry<K, V> {
    * @param key the key
    * @param value the value
    * @return a holder
+   * @throws NullPointerException if the provided key or value are null
    * @since 1.0.0
    */
   Holder<V> register(final K key, final V value);

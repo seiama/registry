@@ -24,10 +24,12 @@
 package com.seiama.registry;
 
 import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.Set;
 import org.junit.jupiter.api.Test;
 
-import static com.google.common.truth.Truth.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
@@ -44,8 +46,11 @@ class RegistryTest {
   @Test
   void testGetBeforeGetOrCreate() {
     assertNull(this.registry.getHolder(EMPTY));
+    assertSame(Optional.empty(), this.registry.getHolderOptionally(EMPTY));
     final Holder<Item> holder = this.registry.getOrCreateHolder(EMPTY);
-    assertSame(holder, this.registry.getHolder(EMPTY)); // get should now return the (unbound) holder we created
+    // should now return the (unbound) holder we created
+    assertSame(holder, this.registry.getHolder(EMPTY));
+    assertEquals(Optional.of(holder), this.registry.getHolderOptionally(EMPTY));
   }
 
   @Test
@@ -54,13 +59,14 @@ class RegistryTest {
 
     final Holder<Item> holder = this.registry.register(EMPTY, item);
 
-    assertThat(this.registry.keys()).containsExactly(EMPTY);
+    assertEquals(Set.of(EMPTY), this.registry.keys());
 
-    assertThat(holder).isInstanceOf(Holders.Immediate.class);
+    assertEquals(Holders.Immediate.class, holder.getClass());
     assertSame(Holder.Type.IMMEDIATE, holder.type());
 
     assertTrue(holder.bound());
     assertSame(item, holder.value());
+    assertEquals(Optional.of(item), holder.valueOptionally());
     assertSame(item, assertDoesNotThrow(holder::valueOrThrow));
 
     final Holder<Item> holderAfterRegistration = this.registry.getHolder(EMPTY);
@@ -74,15 +80,16 @@ class RegistryTest {
     final Holder<Item> holderBeforeRegistration = this.registry.getOrCreateHolder(EMPTY);
 
     // The registry should contain the key even when a value is not bound.
-    assertThat(this.registry.keys()).containsExactly(EMPTY);
+    assertEquals(Set.of(EMPTY), this.registry.keys());
 
     // The returned holder should be lazy, since we have not yet registered a value.
-    assertThat(holderBeforeRegistration).isInstanceOf(Holders.Lazy.class);
+    assertEquals(Holders.Lazy.class, holderBeforeRegistration.getClass());
     assertSame(Holder.Type.LAZY, holderBeforeRegistration.type());
 
     // Lazy holder have no value by default.
     assertFalse(holderBeforeRegistration.bound());
     assertNull(holderBeforeRegistration.value());
+    assertSame(Optional.empty(), holderBeforeRegistration.valueOptionally());
     assertThrows(NoSuchElementException.class, holderBeforeRegistration::valueOrThrow);
 
     final Item value = new Item();
@@ -90,7 +97,7 @@ class RegistryTest {
     final Holder<Item> holderAfterRegistration = this.registry.register(EMPTY, value);
 
     // The returned holder should still be of the lazy type, as the holder itself has not been replaced.
-    assertThat(holderAfterRegistration).isInstanceOf(Holders.Lazy.class);
+    assertEquals(Holders.Lazy.class, holderAfterRegistration.getClass());
     assertSame(Holder.Type.LAZY, holderAfterRegistration.type());
 
     // The holder returned from registering should be the holder we already have, due to us
@@ -99,8 +106,9 @@ class RegistryTest {
 
     assertTrue(holderBeforeRegistration.bound());
 
-    // The value has been set - both of these are now possible.
+    // The value has been set - these are now possible.
     assertSame(value, holderBeforeRegistration.value());
+    assertEquals(Optional.of(value), holderBeforeRegistration.valueOptionally());
     assertSame(value, assertDoesNotThrow(holderBeforeRegistration::valueOrThrow));
 
     this.testRegistrationOfAlreadyRegistered(holderBeforeRegistration, value);
@@ -135,6 +143,14 @@ class RegistryTest {
     final Object b = new Object();
     assertNotNull(RegistryImpl.alreadyBound("ab", a, b));
     assertNotNull(RegistryImpl.alreadyBound("ba", b, a));
+  }
+
+  @Test
+  void testKeys() {
+    final Set<String> keys = this.registry.keys();
+    assertTrue(keys.isEmpty());
+    this.registry.register(EMPTY, new Item());
+    assertEquals(Set.of(EMPTY), keys);
   }
 
   static final class Item {

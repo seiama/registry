@@ -24,6 +24,7 @@
 package com.seiama.registry;
 
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import org.jspecify.annotations.NullMarked;
 import org.jspecify.annotations.Nullable;
 
@@ -50,6 +51,16 @@ public sealed interface Holder<V> permits Holders.Immediate, Holders.Lazy {
    * @since 1.0.0
    */
   @Nullable V value();
+
+  /**
+   * Gets the value wrapped in an {@link Optional}.
+   *
+   * @return the value wrapped in an {@link Optional}
+   * @since 1.0.0
+   */
+  default Optional<V> valueOptionally() {
+    return Optional.ofNullable(this.value());
+  }
 
   /**
    * Gets the value, or throws {@link NoSuchElementException}.
