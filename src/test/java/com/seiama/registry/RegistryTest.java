@@ -47,7 +47,8 @@ class RegistryTest {
   void testGetBeforeGetOrCreate() {
     assertNull(this.registry.getHolder(EMPTY));
     assertSame(Optional.empty(), this.registry.getHolderOptionally(EMPTY));
-    final Holder<Item> holder = this.registry.getOrCreateHolder(EMPTY);
+    final Holder<String, Item> holder = this.registry.getOrCreateHolder(EMPTY);
+    assertEquals(EMPTY, holder.key());
     // should now return the (unbound) holder we created
     assertSame(holder, this.registry.getHolder(EMPTY));
     assertEquals(Optional.of(holder), this.registry.getHolderOptionally(EMPTY));
@@ -57,7 +58,9 @@ class RegistryTest {
   void testImmediate() {
     final Item item = new Item();
 
-    final Holder<Item> holder = this.registry.register(EMPTY, item);
+    final Holder<String, Item> holder = this.registry.register(EMPTY, item);
+
+    assertEquals(EMPTY, holder.key());
 
     assertEquals(Set.of(EMPTY), this.registry.keys());
 
@@ -69,7 +72,7 @@ class RegistryTest {
     assertEquals(Optional.of(item), holder.valueOptionally());
     assertSame(item, assertDoesNotThrow(holder::valueOrThrow));
 
-    final Holder<Item> holderAfterRegistration = this.registry.getHolder(EMPTY);
+    final Holder<String, Item> holderAfterRegistration = this.registry.getHolder(EMPTY);
     assertSame(holder, holderAfterRegistration);
 
     this.testRegistrationOfAlreadyRegistered(holder, item);
@@ -77,7 +80,7 @@ class RegistryTest {
 
   @Test
   void testLazy() {
-    final Holder<Item> holderBeforeRegistration = this.registry.getOrCreateHolder(EMPTY);
+    final Holder<String, Item> holderBeforeRegistration = this.registry.getOrCreateHolder(EMPTY);
 
     // The registry should contain the key even when a value is not bound.
     assertEquals(Set.of(EMPTY), this.registry.keys());
@@ -94,7 +97,7 @@ class RegistryTest {
 
     final Item value = new Item();
 
-    final Holder<Item> holderAfterRegistration = this.registry.register(EMPTY, value);
+    final Holder<String, Item> holderAfterRegistration = this.registry.register(EMPTY, value);
 
     // The returned holder should still be of the lazy type, as the holder itself has not been replaced.
     assertEquals(Holders.Lazy.class, holderAfterRegistration.getClass());
@@ -114,7 +117,7 @@ class RegistryTest {
     this.testRegistrationOfAlreadyRegistered(holderBeforeRegistration, value);
   }
 
-  private void testRegistrationOfAlreadyRegistered(final Holder<Item> holder, final Item item) {
+  private void testRegistrationOfAlreadyRegistered(final Holder<String, Item> holder, final Item item) {
     // Attempting to re-register with the same value is perfectly fine...
     assertSame(holder, this.registry.register(EMPTY, item));
     // ...but with a different value is not allowed.
@@ -124,9 +127,9 @@ class RegistryTest {
   @Test
   void testRegisterSameValueDifferentKeys() {
     final Item item = new Item();
-    final Holder<Item> ha = this.registry.register("a", item);
+    final Holder<String, Item> ha = this.registry.register("a", item);
     assertSame(item, assertDoesNotThrow(ha::valueOrThrow));
-    final Holder<Item> hb = this.registry.register("b", item);
+    final Holder<String, Item> hb = this.registry.register("b", item);
     assertSame(item, assertDoesNotThrow(hb::valueOrThrow));
     assertNotSame(ha, hb);
   }

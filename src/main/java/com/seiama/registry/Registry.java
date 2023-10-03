@@ -61,7 +61,7 @@ public interface Registry<K, V> {
    * @since 1.0.0
    */
   @SuppressWarnings("checkstyle:MethodName")
-  @Nullable Holder<V> getHolder(final K key);
+  @Nullable Holder<K, V> getHolder(final K key);
 
   /**
    * Gets a holder by its key.
@@ -74,7 +74,7 @@ public interface Registry<K, V> {
    * @since 1.0.0
    */
   @SuppressWarnings("checkstyle:MethodName")
-  default Optional<Holder<V>> getHolderOptionally(final K key) {
+  default Optional<Holder<K, V>> getHolderOptionally(final K key) {
     return Optional.ofNullable(this.getHolder(key));
   }
 
@@ -89,7 +89,7 @@ public interface Registry<K, V> {
    * @since 1.0.0
    */
   @SuppressWarnings("checkstyle:MethodName")
-  Holder<V> getOrCreateHolder(final K key);
+  Holder<K, V> getOrCreateHolder(final K key);
 
   /**
    * Registers {@code value} to {@code key}, returning a {@link Holder}.
@@ -100,7 +100,7 @@ public interface Registry<K, V> {
    * @throws NullPointerException if the provided key or value are null
    * @since 1.0.0
    */
-  Holder<V> register(final K key, final V value);
+  Holder<K, V> register(final K key, final V value);
 
   /**
    * Gets the keys.

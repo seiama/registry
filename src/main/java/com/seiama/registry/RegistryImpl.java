@@ -35,20 +35,20 @@ import static java.util.Objects.requireNonNull;
 
 @NullMarked
 final class RegistryImpl<K, V> implements Registry<K, V> {
-  private final Map<K, Holder<V>> keyToHolder = new HashMap<>();
+  private final Map<K, Holder<K, V>> keyToHolder = new HashMap<>();
   private @Nullable Set<K> keys;
 
   @Override
-  public @Nullable Holder<V> getHolder(final K key) {
+  public @Nullable Holder<K, V> getHolder(final K key) {
     requireNonNull(key, "key");
     return this.keyToHolder.get(key);
   }
 
   @Override
-  public Holder<V> getOrCreateHolder(final K key) {
+  public Holder<K, V> getOrCreateHolder(final K key) {
     requireNonNull(key, "key");
 
-    @Nullable Holder<V> holder = this.keyToHolder.get(key);
+    @Nullable Holder<K, V> holder = this.keyToHolder.get(key);
 
     if (holder == null) {
       // No value has been registered for the given key yet - creating a lazy holder here
@@ -61,11 +61,11 @@ final class RegistryImpl<K, V> implements Registry<K, V> {
   }
 
   @Override
-  public Holder<V> register(final K key, final V value) {
+  public Holder<K, V> register(final K key, final V value) {
     requireNonNull(key, "key");
     requireNonNull(value, "value");
 
-    @Nullable Holder<V> holder = this.keyToHolder.get(key);
+    @Nullable Holder<K, V> holder = this.keyToHolder.get(key);
 
     if (holder == null) {
       // A holder was not previously requested prior to registration.

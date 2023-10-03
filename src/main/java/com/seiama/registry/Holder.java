@@ -31,11 +31,20 @@ import org.jspecify.annotations.Nullable;
 /**
  * A holder of a value.
  *
+ * @param <K> the key type
  * @param <V> the value type
  * @since 1.0.0
  */
 @NullMarked
-public sealed interface Holder<V> permits Holders.Immediate, Holders.Lazy {
+public sealed interface Holder<K, V> permits Holders.Immediate, Holders.Lazy {
+  /**
+   * Gets the key.
+   *
+   * @return the key
+   * @since 1.0.0
+   */
+  K key();
+
   /**
    * Checks if this holder has a value associated.
    *

@@ -36,7 +36,7 @@ final class Holders {
   record Immediate<K, V>(
     K key,
     V value
-  ) implements Holder<V> {
+  ) implements Holder<K, V> {
     @Override
     public boolean bound() {
       return true; // An immediate holder always has a value associated with it.
@@ -58,12 +58,17 @@ final class Holders {
     }
   }
 
-  static final class Lazy<K, V> implements Holder<V> {
+  static final class Lazy<K, V> implements Holder<K, V> {
     private final K key;
     private @Nullable V value;
 
     Lazy(final K key) {
       this.key = key;
+    }
+
+    @Override
+    public K key() {
+      return this.key;
     }
 
     @Nullable V bind(final V value) {
