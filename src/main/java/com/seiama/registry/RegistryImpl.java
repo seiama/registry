@@ -40,28 +40,21 @@ final class RegistryImpl<K, V> implements Registry<K, V> {
 
   @Override
   public @Nullable Holder<V> getHolder(final K key) {
-    return this.getHolder0(key, false);
+    requireNonNull(key, "key");
+    return this.keyToHolder.get(key);
   }
 
   @Override
   public Holder<V> getOrCreateHolder(final K key) {
-    return this.getHolder0(key, true);
-  }
-
-  @SuppressWarnings("checkstyle:MethodName")
-  private Holder<V> getHolder0(final K key, final boolean create) {
     requireNonNull(key, "key");
 
     @Nullable Holder<V> holder = this.keyToHolder.get(key);
 
     if (holder == null) {
-      // Only create a new holder when requested
-      if (create) {
-        // No value has been registered for the given key yet - creating a lazy holder here
-        // allows us to provide a way to access the value once it has been registered later on.
-        holder = new Holders.Lazy<>(key);
-        this.keyToHolder.put(key, holder);
-      }
+      // No value has been registered for the given key yet - creating a lazy holder here
+      // allows us to provide a way to access the value once it has been registered later on.
+      holder = new Holders.Lazy<>(key);
+      this.keyToHolder.put(key, holder);
     }
 
     return holder;
@@ -75,7 +68,7 @@ final class RegistryImpl<K, V> implements Registry<K, V> {
     @Nullable Holder<V> holder = this.keyToHolder.get(key);
 
     if (holder == null) {
-      // No holder was previously requested prior to registration.
+      // A holder was not previously requested prior to registration.
       holder = new Holders.Immediate<>(key, value);
       this.keyToHolder.put(key, holder);
     } else {
